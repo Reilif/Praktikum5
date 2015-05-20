@@ -6,7 +6,7 @@ var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
 var MailSchema   = new Schema({
-    _id:String,
+    _id:mongoose.Schema.ObjectId,
     sender:String,
     recipients:[],
     cc:[],
@@ -30,8 +30,12 @@ MailSchema.statics.allFolders = function (cb) {
 
 MailSchema.statics.getFolderMessage = function (folderName,cb) {
     console.log("Alle Nachrichten in Ordner:" + folderName);
-    var msgs = this.find({"folder": folderName}, cb);
+    var msgs = this.find({"folder": folderName},{_id:true}, cb);
     return msgs;
+};
+
+MailSchema.statics.renameFolder = function (folderName,newVal,cb) {
+    return this.update({"folder": folderName}, { $set: { "folder": newVal }},{ multi: true }, cb);
 };
 
 module.exports = mongoose.model('mails', MailSchema);
